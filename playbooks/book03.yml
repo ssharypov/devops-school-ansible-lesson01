@@ -1,0 +1,18 @@
+---
+- name: Lesson 01, Playbook 03
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+   new_file: /etc/default/grub
+
+  tasks:
+
+  - name: Write content in {{new_file}}
+    lineinfile:
+     path: "{{new_file}}"
+     line: "net.ifnames=0\nbiosdevname=0"
+
+#  - name: Apply new params in {{new_file}}
+#    shell: grub2-mkconfig

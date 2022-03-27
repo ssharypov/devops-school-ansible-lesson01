@@ -1,0 +1,54 @@
+---
+- name: Lesson 01, Playbook 01
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+   content_txt: "Welcome to my Web Server"
+   new_file: /var/www/html/index.html
+
+  tasks:
+
+  - name: Install Apache Web Server
+    yum:
+     name: httpd
+     state: latest
+
+  - name: Start Apache Web Server
+    service:
+     name: httpd
+     enabled: yes
+     state: started
+
+  - name: Gather service facts
+    service_facts:
+
+  - name: Verify if Apache Web Server is tunning
+    assert:
+     that:
+      - "'{{ansible_facts.services['httpd.service'].state}}' == 'running'"
+     fail_msg: "Apache Web Server is not running"
+     success_msg: "Apache Web Server is running"
+
+  - name: Create {{new_file}}
+    file:
+     path: "{{ new_file }}"
+     state: touch
+
+  - name: Write content in {{new_file}}
+    lineinfile:
+     path: "{{new_file}}"
+     line: "{{content_txt}}"
+
+  - name: Open HTTP port 80
+    firewalld:
+     permanent:
+     service: http
+     state: enabled
+
+  - name: Open HTTPS port 443
+    firewalld:
+     permanent:
+     service: https
+     state: enabled

@@ -1,0 +1,41 @@
+---
+- name: Lesson 01, Playbook 02
+  hosts: all
+  become: yes
+  gather_facts: yes
+
+  vars:
+   new_file: /var/www/html/index.html
+
+  tasks:
+
+  - name: Stop Apache Web Server
+    service:
+     name: httpd
+     enabled: no
+     state: stopped
+
+  - name: Remove Apache Web Server
+    yum:
+     name: httpd
+     state: absent
+
+  - name: Gather service facts
+    service_facts:
+
+  - name: Remove {{new_file}}
+    file:
+     path: "{{ new_file }}"
+     state: absent
+
+  - name: Close HTTP port
+    firewalld:
+     permanent:
+     service: http
+     state: disabled
+
+  - name: Close HTTPS port
+    firewalld:
+     permanent:
+     service: http
+     state: disabled
